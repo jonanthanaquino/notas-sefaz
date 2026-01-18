@@ -76,14 +76,173 @@ def pegar_forma_pagamento(pagina):
         return None
 
 
+def pegar_num_nota(pagina):
+    if pagina is not None:
+        elemento = pagina.find_all("ul")[0].find("li")
+        elemento = elemento.get_text(" ", strip=True)
+        elemento = elemento.split()
+        elemento = elemento[3]
+
+        if elemento:
+            return elemento
+        else:
+            print("Elemento inexistente")
+            return None
+
+    else:
+        print("Página vazia!")
+
+        return None
+
+
+def pegar_serie_nota(pagina):
+    if pagina is not None:
+        elemento = pagina.find_all("ul")[0].find("li")
+        elemento = elemento.get_text(" ", strip=True)
+        elemento = elemento.split()
+        elemento = elemento[5]
+
+        if elemento:
+            return elemento
+        else:
+            print("Elemento inexistente")
+            return None
+
+    else:
+        print("Página vazia!")
+
+        return None
+
+
+def pegar_data_emissao(pagina):
+    if pagina is not None:
+        elemento = pagina.find_all("ul")[0].find("li")
+        elemento = elemento.get_text(" ", strip=True)
+        elemento = elemento.split()
+        elemento = elemento[7]
+
+        if elemento:
+            return elemento
+        else:
+            print("Elemento inexistente")
+            return None
+
+    else:
+        print("Página vazia!")
+
+        return None
+
+
+def pegar_hora_emissao(pagina):
+    if pagina is not None:
+        elemento = pagina.find_all("ul")[0].find("li")
+        elemento = elemento.get_text(" ", strip=True)
+        elemento = elemento.split()
+        elemento = elemento[8]
+
+        if elemento:
+            return elemento
+        else:
+            print("Elemento inexistente")
+            return None
+
+    else:
+        print("Página vazia!")
+
+        return None
+
+        # data_autorizacao = elemento[16]
+        # hora_autorizacao = elemento[17]
+
+
+def pegar_protocolo(pagina):
+    if pagina is not None:
+        elemento = pagina.find_all("ul")[0].find("li")
+        elemento = elemento.get_text(" ", strip=True)
+        elemento = elemento.split()
+        elemento = elemento[15]
+
+        if elemento:
+            return elemento
+        else:
+            print("Elemento inexistente")
+            return None
+
+    else:
+        print("Página vazia!")
+
+        return None
+
+
+def pegar_data_protocolo(pagina):
+    if pagina is not None:
+        elemento = pagina.find_all("ul")[0].find("li")
+        elemento = elemento.get_text(" ", strip=True)
+        elemento = elemento.split()
+        elemento = elemento[16]
+
+        if elemento:
+            return elemento
+        else:
+            print("Elemento inexistente")
+            return None
+
+    else:
+        print("Página vazia!")
+
+        return None
+
+
+def pegar_hora_protocolo(pagina):
+    if pagina is not None:
+        elemento = pagina.find_all("ul")[0].find("li")
+        elemento = elemento.get_text(" ", strip=True)
+        elemento = elemento.split()
+        elemento = elemento[17]
+
+        if elemento:
+            return elemento
+        else:
+            print("Elemento inexistente")
+            return None
+
+    else:
+        print("Página vazia!")
+
+        return None
+
+
 pagina = buscar_pagina(URL)
 estabelecimento = pegar_estabelecimento(pagina)
 cnpj = pegar_cnpj(pagina)
 endereco = pegar_endereco(pagina)
 pagamento = pegar_forma_pagamento(pagina)
+info_nota_numero = pegar_num_nota(pagina)
+serie_nota = pegar_serie_nota(pagina)
+data_emissao = pegar_data_emissao(pagina)
+hora_emissao = pegar_hora_emissao(pagina)
+protocolo = pegar_protocolo(pagina)
+data_protocolo = pegar_data_protocolo(pagina)
+hora_protocoloc = pegar_hora_protocolo(pagina)
 
 
-# print(f"O nome do estabelecimento é: {estabelecimento}")
-# print(f"O núm. do cnpj é: {cnpj}")
-# print(f"O endereço é: {endereco}")
-print(f"Forma de pagamento é: {pagamento}")
+print(f"""
+===== DADOS DA NFC-e =====
+
+Estabelecimento: {estabelecimento}
+CNPJ: {cnpj}
+Endereço: {endereco}
+
+Forma de pagamento: {pagamento}
+
+Número da Nota: {info_nota_numero}
+Série: {serie_nota}
+Data de Emissão: {data_emissao}
+Hora de Emissão: {hora_emissao}
+
+Protocolo: {protocolo}
+Data do Protocolo: {data_protocolo}
+Hora do Protocolo: {hora_protocoloc}
+
+==========================
+""")
