@@ -33,7 +33,37 @@ def pegar_estabelecimento(pagina):
 
 def pegar_cnpj(pagina):
     if pagina is not None:
-        elemento = pagina.find("div", class_="text")
+        elemento = pagina.find_all("div", class_="text")[0]
+        if elemento:
+            return elemento.text.replace("\t", "").replace("\n", "")
+        else:
+            print("Elemento inexistente")
+            return None
+
+    else:
+        print("Página vazia!")
+
+        return None
+
+
+def pegar_endereco(pagina):
+    if pagina is not None:
+        elemento = pagina.find_all("div", class_="text")[1]
+        if elemento:
+            return elemento.text.replace("\t", "").replace("\n", "")
+        else:
+            print("Elemento inexistente")
+            return None
+
+    else:
+        print("Página vazia!")
+
+        return None
+
+
+def pegar_forma_pagamento(pagina):
+    if pagina is not None:
+        elemento = pagina.find_all("label", class_="tx")[0]
         if elemento:
             return elemento.text.replace("\t", "").replace("\n", "")
         else:
@@ -49,7 +79,11 @@ def pegar_cnpj(pagina):
 pagina = buscar_pagina(URL)
 estabelecimento = pegar_estabelecimento(pagina)
 cnpj = pegar_cnpj(pagina)
+endereco = pegar_endereco(pagina)
+pagamento = pegar_forma_pagamento(pagina)
 
 
-print(f"O nome do estabelecimento é: {estabelecimento}")
-print(f"O núm. do cnpj é: {cnpj}")
+# print(f"O nome do estabelecimento é: {estabelecimento}")
+# print(f"O núm. do cnpj é: {cnpj}")
+# print(f"O endereço é: {endereco}")
+print(f"Forma de pagamento é: {pagamento}")
