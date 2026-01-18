@@ -5,6 +5,7 @@ build/
 dist/
 wheels/
 *.egg-info
+anotacoes.md
 
 # Virtual environments
 .venv
