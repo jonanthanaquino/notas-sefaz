@@ -286,8 +286,10 @@ def executar(url):
     produtos["numero_nota"] = numero
     print(dados_nota.head())
     print(produtos.head())
+    return dados_nota, produtos
 
 
 if __name__ == "__main__":
-    URL = "https://www.sefaz.mt.gov.br/nfce/consultanfce?p=51260124118896000176650090005334571005642263%7C2%7C1%7C1%7CC1E1D6FB1E609D03BE43399B550190AF03AC0D0A"
+    # URL = input("Inserir a url aqui: ")
+    URL = "https://www.sefaz.mt.gov.br/nfce/consultanfce?p=51260109477652019610651100000027241902953355|2|1|1|37780E9EEC7023546CB9EF4EB15B5E3EE4734C32"
     executar(URL)
