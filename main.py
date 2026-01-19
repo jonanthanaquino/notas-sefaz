@@ -1,16 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-import re
 import pandas as pd
-
-
-URL = "https://www.sefaz.mt.gov.br/nfce/consultanfce?p=51260124118896000176650090005334571005642263%7C2%7C1%7C1%7CC1E1D6FB1E609D03BE43399B550190AF03AC0D0A"
 
 
 def buscar_pagina(url):
     response = requests.get(url)
     if response.status_code == 200:
-        pagina = pagina = BeautifulSoup(response.text, "html.parser")
+        pagina = BeautifulSoup(response.text, "html.parser")
         print("Requisição OK!")
         return pagina
     else:
@@ -37,7 +33,7 @@ def pegar_cnpj(pagina):
     if pagina is not None:
         elemento = pagina.find_all("div", class_="text")[0]
         if elemento:
-            return elemento.text.replace("\t", "").replace("\n", "")
+            return elemento.text.replace("\t", "").replace("\n", "")[5:].strip()
         else:
             print("Elemento inexistente")
             return None
@@ -52,7 +48,7 @@ def pegar_endereco(pagina):
     if pagina is not None:
         elemento = pagina.find_all("div", class_="text")[1]
         if elemento:
-            return elemento.text.replace("\t", "").replace("\n", "")
+            return elemento.text.replace("\t", "").replace("\n", "").strip()
         else:
             print("Elemento inexistente")
             return None
@@ -67,7 +63,7 @@ def pegar_forma_pagamento(pagina):
     if pagina is not None:
         elemento = pagina.find_all("label", class_="tx")[0]
         if elemento:
-            return elemento.text.replace("\t", "").replace("\n", "")
+            return elemento.text.replace("\t", "").replace("\n", "").strip()
         else:
             print("Elemento inexistente")
             return None
@@ -83,7 +79,7 @@ def pegar_num_nota(pagina):
         elemento = pagina.find_all("ul")[0].find("li")
         elemento = elemento.get_text(" ", strip=True)
         elemento = elemento.split()
-        elemento = elemento[3]
+        elemento = elemento[3].strip()
 
         if elemento:
             return elemento
@@ -102,7 +98,7 @@ def pegar_serie_nota(pagina):
         elemento = pagina.find_all("ul")[0].find("li")
         elemento = elemento.get_text(" ", strip=True)
         elemento = elemento.split()
-        elemento = elemento[5]
+        elemento = elemento[5].strip()
 
         if elemento:
             return elemento
@@ -121,7 +117,7 @@ def pegar_data_emissao(pagina):
         elemento = pagina.find_all("ul")[0].find("li")
         elemento = elemento.get_text(" ", strip=True)
         elemento = elemento.split()
-        elemento = elemento[7]
+        elemento = elemento[7].strip()
 
         if elemento:
             return elemento
@@ -140,7 +136,7 @@ def pegar_hora_emissao(pagina):
         elemento = pagina.find_all("ul")[0].find("li")
         elemento = elemento.get_text(" ", strip=True)
         elemento = elemento.split()
-        elemento = elemento[8]
+        elemento = elemento[8].strip()
 
         if elemento:
             return elemento
@@ -159,7 +155,7 @@ def pegar_protocolo(pagina):
         elemento = pagina.find_all("ul")[0].find("li")
         elemento = elemento.get_text(" ", strip=True)
         elemento = elemento.split()
-        elemento = elemento[15]
+        elemento = elemento[15].strip()
 
         if elemento:
             return elemento
@@ -178,7 +174,7 @@ def pegar_data_protocolo(pagina):
         elemento = pagina.find_all("ul")[0].find("li")
         elemento = elemento.get_text(" ", strip=True)
         elemento = elemento.split()
-        elemento = elemento[16]
+        elemento = elemento[16].strip()
 
         if elemento:
             return elemento
@@ -197,7 +193,7 @@ def pegar_hora_protocolo(pagina):
         elemento = pagina.find_all("ul")[0].find("li")
         elemento = elemento.get_text(" ", strip=True)
         elemento = elemento.split()
-        elemento = elemento[17]
+        elemento = elemento[17].strip()
 
         if elemento:
             return elemento
@@ -213,7 +209,6 @@ def pegar_hora_protocolo(pagina):
 
 def pegar_produtos(pagina):
     lista = []
-    # dados = dict()
     if pagina is not None:
         produtos = pagina.find_all("table")[1].find_all("tr")
         for produto in produtos:
@@ -263,48 +258,36 @@ def pegar_produtos(pagina):
             }
             lista.append(dados)
 
-        return lista
+        return pd.DataFrame(lista)
 
 
-pagina = buscar_pagina(URL)
-estabelecimento = pegar_estabelecimento(pagina)
-cnpj = pegar_cnpj(pagina)
-endereco = pegar_endereco(pagina)
-pagamento = pegar_forma_pagamento(pagina)
-info_nota_numero = pegar_num_nota(pagina)
-serie_nota = pegar_serie_nota(pagina)
-data_emissao = pegar_data_emissao(pagina)
-hora_emissao = pegar_hora_emissao(pagina)
-protocolo = pegar_protocolo(pagina)
-data_protocolo = pegar_data_protocolo(pagina)
-hora_protocoloc = pegar_hora_protocolo(pagina)
+def extrair_dados_nota(pagina):
+    dados_nota = {
+        "estabelecimento": pegar_estabelecimento(pagina),
+        "cnpj": pegar_cnpj(pagina),
+        "endereco": pegar_endereco(pagina),
+        "pagamento": pegar_forma_pagamento(pagina),
+        "numero_nota": pegar_num_nota(pagina),
+        "serie_nota": pegar_serie_nota(pagina),
+        "data_emissao": pegar_data_emissao(pagina),
+        "hora_emissao": pegar_hora_emissao(pagina),
+        "protocolo": pegar_protocolo(pagina),
+        "data_protocolo": pegar_data_protocolo(pagina),
+        "hora_protocolo": pegar_hora_protocolo(pagina),
+    }
+    return pd.DataFrame([dados_nota])
 
 
-print(f"""
-===== DADOS DA NFC-e =====
+def executar(url):
+    pagina = buscar_pagina(url)
+    dados_nota = extrair_dados_nota(pagina)
+    produtos = pegar_produtos(pagina)
+    numero = dados_nota["numero_nota"].iloc[0]
+    produtos["numero_nota"] = numero
+    print(dados_nota.head())
+    print(produtos.head())
 
-Estabelecimento: {estabelecimento}
-CNPJ: {cnpj}
-Endereço: {endereco}
 
-Forma de pagamento: {pagamento}
-
-Número da Nota: {info_nota_numero}
-Série: {serie_nota}
-Data de Emissão: {data_emissao}
-Hora de Emissão: {hora_emissao}
-
-Protocolo: {protocolo}
-Data do Protocolo: {data_protocolo}
-Hora do Protocolo: {hora_protocoloc}
-
-==========================
-""")
-
-print("Lista de compras:\n\n==========================")
-# URL = "https://www.sefaz.mt.gov.br/nfce/consultanfce?p=51260109477652019610651100000027241902953355|2|1|1|37780E9EEC7023546CB9EF4EB15B5E3EE4734C32"
-# pagina = buscar_pagina(URL)
-dados = pegar_produtos(pagina)
-df = pd.DataFrame(dados)
-print(df.head(12))
-# print(df.info())
+if __name__ == "__main__":
+    URL = "https://www.sefaz.mt.gov.br/nfce/consultanfce?p=51260124118896000176650090005334571005642263%7C2%7C1%7C1%7CC1E1D6FB1E609D03BE43399B550190AF03AC0D0A"
+    executar(URL)
